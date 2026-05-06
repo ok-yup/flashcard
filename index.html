@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FlashLearn — บัตรคำศัพท์</title>
+  <meta name="description" content="แอปบัตรคำศัพท์ เชื่อมกับ Google Form + Google Sheet" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Theme Toggle -->
+  <button id="themeToggle" onclick="toggleTheme()" style="
+    position: fixed; top: 14px; right: 16px; z-index: 999;
+    width: 38px; height: 38px; border-radius: 50%;
+    background: var(--surface); border: 1px solid var(--border-md);
+    cursor: pointer; font-size: 17px;
+    display: flex; align-items: center; justify-content: center;
+  ">🌙</button>
+
+  <script>
+    (function(){
+      const t = localStorage.getItem('fl_theme') || 'dark';
+      document.body.setAttribute('data-theme', t);
+      document.addEventListener('DOMContentLoaded', function(){
+        document.getElementById('themeToggle').textContent = t === 'dark' ? '☀️' : '🌙';
+      });
+    })();
+    function toggleTheme() {
+      const cur = document.body.getAttribute('data-theme');
+      const next = cur === 'dark' ? 'light' : 'dark';
+      document.body.setAttribute('data-theme', next);
+      document.getElementById('themeToggle').textContent = next === 'dark' ? '☀️' : '🌙';
+      localStorage.setItem('fl_theme', next);
+    }
+  </script>
+
+  <!-- ===================== SETUP SCREEN ===================== -->
+  <div id="setupScreen" class="screen">
+    <div class="setup-wrap">
+
+      <div class="setup-logo">
+        <span>⚡</span>
+        <h1>FlashLearn</h1>
+      </div>
+      <p class="setup-sub">ฝึกจำคำศัพท์ด้วย Flashcard เชื่อมกับ Google Form + Sheet</p>
+
+      <div class="setup-card">
+        <div>
+          <label class="input-label">ลิงก์ Google Form</label>
+          <input type="url" id="formUrl" class="input-field" placeholder="วางลิงก์ที่นี่..." autocomplete="off" />
+        </div>
+        <div>
+          <label class="input-label">ลิงก์ Google Sheet</label>
+          <input type="url" id="sheetUrl" class="input-field" placeholder="วางลิงก์ที่นี่..." autocomplete="off" />
+        </div>
+        <div id="setupError" class="error-msg hidden"></div>
+        <button class="btn btn-primary btn-large" onclick="connectAll()">เริ่มใช้งาน →</button>
+      </div>
+
+      <div style="display: flex; gap: 12px; align-items: center;">
+        <button class="btn-ghost-sm" onclick="loadDemo()">ทดลองใช้งาน</button>
+        <a href="guide.html" class="btn-ghost-sm" style="text-decoration: none;">📖 คู่มือ</a>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ===================== MAIN APP SCREEN ===================== -->
+  <div id="appScreen" class="screen hidden">
+
+    <!-- Header -->
+    <header class="header">
+      <div class="header-inner">
+        <div class="logo" onclick="goBack()" style="cursor: pointer;">
+          <span class="logo-icon">⚡</span>
+          <span class="logo-text">FlashLearn</span>
+        </div>
+        <div class="header-right">
+          <span class="stat-badge" id="cardCountBadge">0 ใบ</span>
+          <button class="btn btn-ghost btn-xs" onclick="goBack()">⚙️</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Tabs -->
+    <div class="tabs-wrap">
+      <div class="tabs">
+        <button class="tab active" id="tabStudy" onclick="switchTab('study')">เรียนรู้</button>
+        <button class="tab" id="tabAdd" onclick="switchTab('add')">จดคำศัพท์</button>
+      </div>
+    </div>
+
+    <!-- ===== Tab: Study ===== -->
+    <div class="tab-content" id="panelStudy">
+      <div class="study-container">
+
+        <!-- Controls -->
+        <div class="controls-bar">
+          <button class="btn btn-ghost btn-sm" onclick="loadCards()">🔄 โหลดใหม่</button>
+          <button class="btn btn-ghost btn-sm" onclick="shuffleCards()">🔀 สุ่ม</button>
+        </div>
+
+        <!-- Progress -->
+        <div class="progress-wrap">
+          <div class="progress-info">
+            <span id="cardCounter">0 / 0</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+        </div>
+
+        <!-- Flashcard -->
+        <div class="card-scene" id="cardScene">
+          <div class="card" id="flashcard" onclick="flipCard()">
+            <div class="card-face card-front">
+              <div class="face-chip" id="labelFront">คำศัพท์</div>
+              <div class="card-word" id="cardWord">—</div>
+              <div id="cardTime" style="position: absolute; bottom: 45px; font-size: 11px; color: var(--dim); font-weight: 500;"></div>
+              <div class="flip-hint">แตะเพื่อดูความหมาย</div>
+            </div>
+            <div class="card-face card-back">
+              <div class="face-chip face-chip-ans" id="labelBack">ความหมาย</div>
+              <div class="card-meaning" id="cardMeaning">—</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Empty state -->
+        <div class="empty-state hidden" id="emptyState">
+          <div class="empty-icon">📭</div>
+          <p>ยังไม่มีคำศัพท์</p>
+          <p class="empty-sub">ไปที่แท็บ "จดคำศัพท์" เพื่อเพิ่มข้อมูล</p>
+          <button class="btn btn-primary" onclick="switchTab('add')" style="margin-top:16px">จดเลย</button>
+        </div>
+
+        <!-- Actions -->
+        <div class="action-row" id="actionRow">
+          <button class="btn btn-nav" onclick="prevCard()">←</button>
+          <button class="btn btn-primary" onclick="nextCard()" style="flex:1;">ถัดไป →</button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ===== Tab: Add (Google Form Embed) ===== -->
+    <div class="tab-content hidden" id="panelAdd">
+      <div class="form-info-bar">
+        <span>กรอกคำศัพท์ใหม่ผ่าน Google Form ด้านล่าง</span>
+        <button class="btn btn-primary btn-sm" onclick="switchTab('study'); loadCards();">เสร็จแล้ว → เรียน</button>
+      </div>
+      <div class="form-embed-wrap">
+        <iframe id="formIframe" src="about:blank" class="form-iframe" title="Google Form"></iframe>
+      </div>
+    </div>
+
+    <!-- Completion Screen -->
+    <div class="completion hidden" id="completionPanel">
+      <div class="completion-card">
+        <div class="big-emoji">🎉</div>
+        <h2>เรียนครบหมดแล้ว!</h2>
+        <div class="completion-btns">
+          <button class="btn btn-primary" onclick="resetStudy()">เริ่มเรียนใหม่</button>
+          <button class="btn btn-ghost" onclick="switchTab('add')">จดคำศัพท์เพิ่ม</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Loading Overlay -->
+  <div class="loading-overlay hidden" id="loadingOverlay">
+    <div class="spinner"></div>
+    <p id="loadingText">กำลังโหลด...</p>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
