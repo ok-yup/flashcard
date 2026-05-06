@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>คู่มือ FlashLearn</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body { padding: 32px 20px 60px; max-width: 640px; margin: 0 auto; }
+
+    .guide-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 32px;
+    }
+
+    .guide-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 32px;
+    }
+    .guide-tab {
+      padding: 12px 20px;
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      color: var(--muted);
+      font-family: var(--font);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: color 0.2s, border-color 0.2s;
+      margin-bottom: -1px;
+    }
+    .guide-tab.active { color: var(--purple); border-bottom-color: var(--purple); }
+    .guide-tab:not(.active):hover { color: var(--text); }
+
+    .guide-content { animation: fadeSlideUp 0.25s ease both; }
+
+    .guide-title { font-size: 22px; font-weight: 800; margin-bottom: 6px; color: var(--text); }
+    .guide-desc { color: var(--muted); font-size: 15px; margin-bottom: 28px; line-height: 1.7; }
+
+    /* Feature cards for About tab */
+    .feature-list { display: flex; flex-direction: column; gap: 12px; }
+    .feature-card {
+      background: var(--surface);
+      border: 1px solid var(--border-md);
+      border-radius: var(--r-md);
+      padding: 16px 20px;
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+    .feature-icon { font-size: 24px; flex-shrink: 0; margin-top: 2px; }
+    .feature-title { font-size: 15px; font-weight: 700; margin-bottom: 4px; color: var(--text); }
+    .feature-desc { font-size: 14px; color: var(--muted); line-height: 1.6; }
+
+    /* Step list for Setup tab */
+    .step-list { display: flex; flex-direction: column; gap: 0; }
+    .step-item {
+      display: flex;
+      gap: 16px;
+      padding-bottom: 24px;
+      position: relative;
+    }
+    .step-item:not(:last-child)::before {
+      content: '';
+      position: absolute;
+      left: 13px;
+      top: 28px;
+      bottom: 0;
+      width: 1px;
+      background: var(--border-md);
+    }
+    .step-num {
+      flex-shrink: 0;
+      width: 28px; height: 28px;
+      background: var(--purple);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 800; color: white;
+      position: relative; z-index: 1;
+    }
+    .step-body { padding-top: 3px; flex: 1; }
+    .step-title { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+    .step-desc { font-size: 14px; color: var(--muted); line-height: 1.7; }
+    .step-desc strong { color: var(--text); font-weight: 600; }
+    .step-note {
+      margin-top: 8px;
+      padding: 10px 14px;
+      background: var(--surface);
+      border: 1px solid var(--border-md);
+      border-radius: var(--r-sm);
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .step-note strong { color: var(--purple); }
+
+    .hidden { display: none; }
+
+    #themeToggle {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--surface); border: 1px solid var(--border-md);
+      cursor: pointer; font-size: 16px;
+      display: flex; align-items: center; justify-content: center;
+    }
+  </style>
+</head>
+<body>
+
+  <script>
+    (function(){
+      const t = localStorage.getItem('fl_theme') || 'dark';
+      document.body.setAttribute('data-theme', t);
+    })();
+    function toggleTheme() {
+      const cur = document.body.getAttribute('data-theme');
+      const next = cur === 'dark' ? 'light' : 'dark';
+      document.body.setAttribute('data-theme', next);
+      document.getElementById('themeToggle').textContent = next === 'dark' ? '☀️' : '🌙';
+      localStorage.setItem('fl_theme', next);
+    }
+  </script>
+
+  <div class="guide-header">
+    <a href="index.html" style="text-decoration: none; color: var(--muted); font-size: 14px;">← กลับ</a>
+    <button id="themeToggle" onclick="toggleTheme()">🌙</button>
+  </div>
+
+  <div class="guide-tabs">
+    <button class="guide-tab active" id="tabAbout" onclick="switchTab('about')">💡 แนะนำแอป</button>
+    <button class="guide-tab" id="tabSetup" onclick="switchTab('setup')">⚙️ วิธีตั้งค่า</button>
+  </div>
+
+  <!-- ======================== ABOUT TAB ======================== -->
+  <div id="contentAbout" class="guide-content">
+    <h1 class="guide-title">FlashLearn คืออะไร?</h1>
+    <p class="guide-desc">
+      แอปฝึกจำคำศัพท์แบบ Flashcard ที่ใช้ Google Form เป็นที่จดคำศัพท์ และ Google Sheet เป็นที่เก็บข้อมูล
+      ไม่ต้องสมัครสมาชิก ไม่มีค่าใช้จ่าย ข้อมูลทั้งหมดอยู่ใน Google Drive ของคุณเอง
+    </p>
+
+    <div class="feature-list">
+      <div class="feature-card">
+        <div class="feature-icon">🃏</div>
+        <div>
+          <div class="feature-title">เรียนรู้แบบ Flashcard</div>
+          <div class="feature-desc">กดที่การ์ดเพื่อพลิกดูความหมาย กดปุ่ม "ถัดไป" เพื่อไปการ์ดใบต่อไป ใช้งานบนมือถือและคอมได้เลย</div>
+        </div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔀</div>
+        <div>
+          <div class="feature-title">สุ่มการ์ดทุกรอบ</div>
+          <div class="feature-desc">ทุกครั้งที่เริ่มเรียนใหม่ ระบบจะสับลำดับการ์ดโดยอัตโนมัติ ช่วยให้จำได้จริง ไม่ใช่แค่จำลำดับ</div>
+        </div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📝</div>
+        <div>
+          <div class="feature-title">จดคำศัพท์ง่ายผ่าน Google Form</div>
+          <div class="feature-desc">เจอคำศัพท์ใหม่ตอนไหน เปิด Form พิมพ์แล้วกด Submit ได้เลย รองรับการใช้งานบนมือถือได้ดีมาก</div>
+        </div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔄</div>
+        <div>
+          <div class="feature-title">ซิงค์ข้อมูลแบบเรียลไทม์</div>
+          <div class="feature-desc">พิมพ์คำศัพท์ลง Form แล้วกลับมากด "โหลดใหม่" ที่หน้าเรียน คำศัพท์ใหม่จะขึ้นมาทันทีโดยไม่ต้องตั้งค่าอะไรเพิ่ม</div>
+        </div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🌙</div>
+        <div>
+          <div class="feature-title">โหมดกลางวัน / กลางคืน</div>
+          <div class="feature-desc">กดปุ่ม ☀️ / 🌙 มุมขวาบนเพื่อสลับธีม ระบบจะจำค่าที่เลือกไว้ให้ทุกครั้งที่กลับมาใช้งาน</div>
+        </div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔒</div>
+        <div>
+          <div class="feature-title">ข้อมูลเป็นของคุณ 100%</div>
+          <div class="feature-desc">คำศัพท์ทั้งหมดเก็บอยู่ใน Google Drive ของคุณเอง แอปนี้ไม่ได้เก็บข้อมูลใดๆ ลบหรือย้ายข้อมูลได้ตลอดเวลา</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================== SETUP TAB ======================== -->
+  <div id="contentSetup" class="guide-content hidden">
+    <h1 class="guide-title">วิธีตั้งค่า (ทำครั้งเดียว)</h1>
+    <p class="guide-desc">ตั้งค่าแค่ครั้งแรกครั้งเดียว หลังจากนั้นเปิดมาจดและเรียนได้เลย</p>
+
+    <div class="step-list">
+
+      <div class="step-item">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <div class="step-title">สร้าง Google Form สำหรับจดคำศัพท์</div>
+          <div class="step-desc">
+            ไปที่ <strong>forms.google.com</strong> แล้วสร้าง Form ใหม่ ตั้งชื่อว่าอะไรก็ได้ เช่น "จดคำศัพท์"<br><br>
+            เพิ่มคำถาม 2 ข้อ ประเภท <strong>"คำตอบสั้น"</strong>:
+            <ul style="margin-top: 8px; margin-left: 20px; line-height: 2;">
+              <li>ช่องที่ 1 — ชื่อ: <strong>คำศัพท์</strong></li>
+              <li>ช่องที่ 2 — ชื่อ: <strong>ความหมาย</strong></li>
+            </ul>
+          </div>
+          <div class="step-note">💡 ตั้งชื่อช่องให้ตรงเป๊ะ เพราะแอปจะอ่านหัวคอลัมน์จาก Sheet</div>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <div class="step-title">เชื่อม Form กับ Google Sheet</div>
+          <div class="step-desc">
+            ใน Form ที่สร้างไว้ กดแท็บ <strong>"การตอบกลับ" (Responses)</strong> ที่แถบบนสุด<br><br>
+            แล้วกดไอคอนรูป Google Sheets สีเขียว แล้วเลือก <strong>"สร้างสเปรดชีตใหม่" (Create a new spreadsheet)</strong> แล้วกด "สร้าง"
+          </div>
+          <div class="step-note">✅ Google Sheet ใหม่จะเปิดขึ้นมาอัตโนมัติ และมีหัวคอลัมน์ "คำศัพท์" กับ "ความหมาย" รอไว้แล้ว</div>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <div class="step-title">เปิดให้แอปอ่านข้อมูลจาก Sheet ได้</div>
+          <div class="step-desc">
+            ในหน้า Google Sheet ที่เพิ่งเปิดขึ้นมา กดปุ่ม <strong>"แชร์" (Share)</strong> มุมขวาบน<br><br>
+            ตรงช่อง "General access" เปลี่ยนจาก "Restricted" เป็น <strong>"Anyone with the link"</strong>
+            แล้วตั้งสิทธิ์เป็น <strong>"Viewer"</strong> แล้วกด "Done"
+          </div>
+          <div class="step-note">⚠️ ถ้าไม่ทำขั้นตอนนี้ แอปจะโหลดคำศัพท์ไม่ได้</div>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num">4</div>
+        <div class="step-body">
+          <div class="step-title">คัดลอกลิงก์ Form (สำหรับใส่ช่องแรก)</div>
+          <div class="step-desc">
+            กลับไปที่หน้า Google Form แล้วกดปุ่ม <strong>"ส่ง" (Send)</strong> สีม่วงมุมขวาบน<br><br>
+            กดแท็บรูปลิงก์ 🔗 แล้วกด <strong>"คัดลอกลิงก์"</strong> — นี่คือลิงก์สำหรับช่องแรกในแอป
+          </div>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num">5</div>
+        <div class="step-body">
+          <div class="step-title">คัดลอกลิงก์ Sheet (สำหรับใส่ช่องที่สอง)</div>
+          <div class="step-desc">
+            ไปที่หน้า Google Sheet แล้วก็อปปี้ URL ยาวๆ บนแถบที่อยู่เว็บบราวเซอร์ได้เลย<br><br>
+            นี่คือลิงก์สำหรับใส่ในช่องที่สองของแอป
+          </div>
+        </div>
+      </div>
+
+      <div class="step-item">
+        <div class="step-num">6</div>
+        <div class="step-body">
+          <div class="step-title">ใส่ลิงก์ในแอปแล้วกดเริ่มใช้งาน</div>
+          <div class="step-desc">
+            <a href="index.html" style="color: var(--purple);">กลับไปหน้าแอป</a> แล้วนำลิงก์ที่คัดลอกมาวางในช่องที่ตรงกัน แล้วกดปุ่ม <strong>"เริ่มใช้งาน"</strong>
+          </div>
+          <div class="step-note">🎉 เสร็จแล้ว! ลองไปที่แท็บ "จดคำศัพท์" แล้วพิมพ์คำศัพท์แรกเพื่อทดสอบได้เลย</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // Init theme toggle icon after DOM ready
+    const _t = localStorage.getItem('fl_theme') || 'dark';
+    document.getElementById('themeToggle').textContent = _t === 'dark' ? '☀️' : '🌙';
+
+    function switchTab(tab) {
+      document.getElementById('tabAbout').classList.toggle('active', tab === 'about');
+      document.getElementById('tabSetup').classList.toggle('active', tab === 'setup');
+      document.getElementById('contentAbout').classList.toggle('hidden', tab !== 'about');
+      document.getElementById('contentSetup').classList.toggle('hidden', tab !== 'setup');
+    }
+  </script>
+
+</body>
+</html>
