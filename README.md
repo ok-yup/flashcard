@@ -1,5 +1,6 @@
 # FlashLearn
-
+  https://sourcemayongnet.github.io/flashcard/
+  
 แอปบัตรคำศัพท์ที่ใช้ Google Form + Google Sheet เป็น backend
 ไม่ต้องมี server ไม่ต้องสมัครสมาชิก เปิด browser ใช้ได้เลย
 
@@ -22,7 +23,7 @@
 
 - Google Sheet ต้องแชร์เป็น public จึงจะโหลดข้อมูลได้
 - ข้อมูลอยู่ใน Google Sheet ของคุณเอง ไม่ได้เก็บในแอป
-  https://sourcemayongnet.github.io/flashcard/
+
 
 ## Tech Stack
 
