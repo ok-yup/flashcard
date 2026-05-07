@@ -22,6 +22,7 @@
 
 - Google Sheet ต้องแชร์เป็น public จึงจะโหลดข้อมูลได้
 - ข้อมูลอยู่ใน Google Sheet ของคุณเอง ไม่ได้เก็บในแอป
+  https://sourcemayongnet.github.io/flashcard/
 
 ## Tech Stack
 
